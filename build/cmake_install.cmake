@@ -132,6 +132,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/neerajb/Desktop/voiage_ws/build/gtest/cmake_install.cmake")
   include("/home/neerajb/Desktop/voiage_ws/build/realsense2_description/cmake_install.cmake")
+  include("/home/neerajb/Desktop/voiage_ws/build/realsense_test_sub/cmake_install.cmake")
   include("/home/neerajb/Desktop/voiage_ws/build/realsense_gazebo_plugin/cmake_install.cmake")
 
 endif()

@@ -1,0 +1,8 @@
+prefix=/home/neerajb/Desktop/voiage_ws/devel
+
+Name: realsense_test_sub
+Description: Description of realsense_test_sub
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

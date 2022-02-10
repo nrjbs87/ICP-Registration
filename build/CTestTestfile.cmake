@@ -6,4 +6,5 @@
 # testing this directory and lists subdirectories to be tested as well.
 subdirs("gtest")
 subdirs("realsense2_description")
+subdirs("realsense_test_sub")
 subdirs("realsense_gazebo_plugin")

@@ -873,6 +873,12 @@ realsense_gazebo_plugin_LIB_DEPENDS:STATIC=general;/opt/ros/melodic/lib/libgazeb
 //Value Computed by CMake
 realsense_gazebo_plugin_SOURCE_DIR:STATIC=/home/neerajb/Desktop/voiage_ws/src/realsense_gazebo_plugin
 
+//Value Computed by CMake
+realsense_test_sub_BINARY_DIR:STATIC=/home/neerajb/Desktop/voiage_ws/build/realsense_test_sub
+
+//Value Computed by CMake
+realsense_test_sub_SOURCE_DIR:STATIC=/home/neerajb/Desktop/voiage_ws/src/realsense_test_sub
+
 //The directory containing a CMake configuration file for rosconsole.
 rosconsole_DIR:PATH=/opt/ros/melodic/share/rosconsole/cmake
 
@@ -1257,7 +1263,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=7
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
