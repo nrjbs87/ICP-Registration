@@ -1,0 +1,2 @@
+realsense2_description:realsense_gazebo_plugin
+-DCATKIN_DEVEL_PREFIX=/home/neerajb/Desktop/voiage_ws/devel -DCMAKE_INSTALL_PREFIX=/home/neerajb/Desktop/voiage_ws/install -G Unix Makefiles
