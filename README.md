@@ -13,17 +13,17 @@ Helpful links to get openCV images from both cameras. Follow the instructions be
 
 ## Conda Environment Setup
 
-*Note - SIFT was discontinued for > openCV 3.4 so need to install opencv-contrib-python instead.*
+*Note* - SIFT was discontinued for > openCV 3.4 so need to install opencv-contrib-python instead.
 
-1. pip3 install --upgrade pip 
-2. conda create -n voaige python=3.8
-3. conda activate voiage
-4. pip3 install opencv-python-headless
-5. pip3 install opencv-contrib-python
-6. pip3 install sklearn
-7. pip3 install packaging 
-8. pip3 install Pillow
-9. pip3 install six
+1. `pip3 install --upgrade pip` 
+2. `conda create -n voaige python=3.8`
+3. `conda activate voiage`
+4. `pip3 install opencv-python-headless`
+5. `pip3 install opencv-contrib-python`
+6. `pip3 install sklearn`
+7. `pip3 install packaging` 
+8. `pip3 install Pillow`
+9. `pip3 install six`
 
 
 
