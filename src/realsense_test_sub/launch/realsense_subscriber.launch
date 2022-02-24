@@ -1,3 +1,0 @@
-<launch>
-    <node pkg="realsense_test_sub" name="realsense_subscriber" type="realsense_subscriber.py" output="screen"/>
-</launch>
