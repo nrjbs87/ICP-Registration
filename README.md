@@ -6,10 +6,9 @@ Github to manage the development of Voiage's 3D scene reconstruction source code
 
 ## Useful Repos
 
-Download the following two packages to install the realsense gazebo ROS plugin and as well as the realsense description (URDFs)
+Helpfull links to get openCV images from both cameras. To get the SN's run `realsense-viewer` and add devices to the UI. 
 
-1. https://github.com/issaiass/realsense_gazebo_plugin
-2. https://github.com/issaiass/realsense2_description
-
+1. https://github.com/IntelRealSense/librealsense/blob/development/doc/distribution_linux.md
+2. https://github.com/IntelRealSense/librealsense/issues/1735
 
 
