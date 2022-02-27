@@ -2,6 +2,8 @@ import pyrealsense2 as rs
 import numpy as np
 import cv2
 import logging
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 
 # Configure depth and color streams...
@@ -59,7 +61,7 @@ try:
         cv2.namedWindow('RealSense', cv2.WINDOW_NORMAL)
         cv2.imshow('RealSense', images)
         cv2.waitKey(1)
-
+     
         # Save images and depth maps from both cameras by pressing 's'
         ch = cv2.waitKey(25)
         if ch==115:
