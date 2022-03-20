@@ -31,9 +31,3 @@ if __name__ == "__main__":
 
     vis1.destroy_window()
     vis2.destroy_window()
-
-    #o3d.visualization.draw_geometries([pcd_load])
-
-    # convert Open3D.o3d.geometry.PointCloud to numpy array
-    #xyz_load = np.asarray(pcd_load.points)
-
