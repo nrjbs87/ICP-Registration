@@ -7,9 +7,33 @@ import open3d as o3d
 if __name__ == "__main__":
 
     # Load saved point cloud and visualize it
-    pcd_load = o3d.io.read_point_cloud("2.ply")
-    o3d.visualization.draw_geometries([pcd_load])
+    pcd_load1 = o3d.io.read_point_cloud("1.ply")
+    pcd_load2 = o3d.io.read_point_cloud("2.ply")
+
+    vis1 = o3d.visualization.Visualizer()
+    vis1.create_window(window_name='TopLeft', width=960, height=540, left=0, top=0)
+    vis1.add_geometry(pcd_load1)
+
+    vis2 = o3d.visualization.Visualizer()
+    vis2.create_window(window_name='TopRight', width=960, height=540, left=960, top=0)
+    vis2.add_geometry(pcd_load2)
+
+    while True:
+        vis1.update_geometry(pcd_load1)
+        if not vis1.poll_events():
+            break
+        vis1.update_renderer()
+
+        vis2.update_geometry(pcd_load2)
+        if not vis2.poll_events():
+            break
+        vis2.update_renderer()
+
+    vis1.destroy_window()
+    vis2.destroy_window()
+
+    #o3d.visualization.draw_geometries([pcd_load])
 
     # convert Open3D.o3d.geometry.PointCloud to numpy array
-    xyz_load = np.asarray(pcd_load.points)
+    #xyz_load = np.asarray(pcd_load.points)
 
