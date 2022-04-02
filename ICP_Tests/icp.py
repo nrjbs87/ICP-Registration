@@ -15,8 +15,8 @@ def draw_registration_result(source, target, transformation):
 
 
 if __name__ == "__main__":
-    source = o3d.io.read_point_cloud("extend_1.ply")
-    target = o3d.io.read_point_cloud("extend_2.ply")
+    source = o3d.io.read_point_cloud("toolbin_2_1.ply")
+    target = o3d.io.read_point_cloud("toolbin_2_2.ply")
     threshold = 0.02
     trans_init = np.asarray([[1.0, 0.0, 0.0, 0.0],
                              [0.0, 1.0, 0.0, 0.0],
