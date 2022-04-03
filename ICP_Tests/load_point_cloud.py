@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
 
     # Load saved point cloud and visualize it
-    pcd_load1 = o3d.io.read_point_cloud("toolbin_1_1.ply")
-    pcd_load2 = o3d.io.read_point_cloud("toolbin_1_2.ply")
+    pcd_load1 = o3d.io.read_point_cloud("toolbin_5_1.ply")
+    pcd_load2 = o3d.io.read_point_cloud("toolbin_5_2.ply")
 
     vis1 = o3d.visualization.Visualizer()
     vis1.create_window(window_name='TopLeft', width=960, height=540, left=0, top=0)

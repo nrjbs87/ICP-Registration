@@ -42,8 +42,8 @@ try:
     colorized2 = colorizer.process(frames2)
 
     # Create save_to_ply object
-    ply1 = rs.save_to_ply("toolbin_4_1.ply")
-    ply2 = rs.save_to_ply("toolbin_4_2.ply")
+    ply1 = rs.save_to_ply("toolbin_5_1.ply")
+    ply2 = rs.save_to_ply("toolbin_5_2.ply")
 
     # Set options to the desired values
     # In this example we'll generate a textual PLY with normals (mesh is already created by default)

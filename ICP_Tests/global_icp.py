@@ -36,8 +36,8 @@ def prepare_dataset(voxel_size):
     print(":: Load two point clouds and disturb initial pose.")
 
     demo_icp_pcds = o3d.data.DemoICPPointClouds()
-    source = o3d.io.read_point_cloud("toolbin_2_1.ply")
-    target = o3d.io.read_point_cloud("toolbin_2_2.ply")
+    source = o3d.io.read_point_cloud("toolbin_5_1.ply")
+    target = o3d.io.read_point_cloud("toolbin_5_2.ply")
 
     # trans_init = np.asarray([[0.0, 0.0, 1.0, 0.0], [1.0, 0.0, 0.0, 0.0],
     #                          [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
