@@ -54,6 +54,7 @@ def execute_fast_global_registration(source_down, target_down, source_fpfh,
             maximum_correspondence_distance=distance_threshold))
     return result
 
+
 def refine_registration(source, target, source_fpfh, target_fpfh, voxel_size):
     distance_threshold = voxel_size * 0.4
     print(":: Point-to-plane ICP registration is applied on original point")
@@ -105,8 +106,7 @@ if __name__ == "__main__":
 
             pc1 = rs.pointcloud()
             pc1.map_to(color_frame_1)
-            points1 = pc1.calculate(depth_frame:: Compute FPFH feature with search radius 0.250.
-_1)
+            points1 = pc1.calculate(depth_frame_1)
             points1_np = points1.get_vertices()
             points1_np = np.asanyarray(points1_np)
 
