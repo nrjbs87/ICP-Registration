@@ -1,5 +1,3 @@
-# examples/Python/Basic/icp_registration.py
-
 import open3d as o3d
 import numpy as np
 import copy
@@ -7,6 +5,7 @@ import pyrealsense2 as rs
 
 
 def draw_registration_result(source, target, transformation):
+    print("HERE")
     source_temp = copy.deepcopy(source)
     target_temp = copy.deepcopy(target)
     source_temp.paint_uniform_color([1, 0.706, 0])
@@ -33,13 +32,6 @@ def preprocess_point_cloud(pcd, voxel_size):
 def prepare_dataset(voxel_size, source, target):
     print(":: Load two point clouds and disturb initial pose.")
 
-    
-
-    # source = source.flatten().reshape(480 * 640, 3)
-    # target = target.flatten().reshape(480 * 640, 3)
-
-    # print(source.shape)
-
     source_pcd = o3d.geometry.PointCloud()
     target_pcd = o3d.geometry.PointCloud()
     source_pcd.points = o3d.utility.Vector3dVector(source)
@@ -62,12 +54,17 @@ def execute_fast_global_registration(source_down, target_down, source_fpfh,
             maximum_correspondence_distance=distance_threshold))
     return result
 
-
 def refine_registration(source, target, source_fpfh, target_fpfh, voxel_size):
     distance_threshold = voxel_size * 0.4
     print(":: Point-to-plane ICP registration is applied on original point")
     print("   clouds to refine the alignment. This time we use a strict")
     print("   distance threshold %.3f." % distance_threshold)
+
+    radius_normal = voxel_size * 2
+    print(":: Estimate normal with search radius %.3f." % radius_normal)
+    target.estimate_normals(
+        o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
+
     result = o3d.pipelines.registration.registration_icp(
         source, target, distance_threshold, result_ransac.transformation,
         o3d.pipelines.registration.TransformationEstimationPointToPlane())
@@ -103,14 +100,13 @@ if __name__ == "__main__":
             frames_1 = pipeline_1.wait_for_frames()
             color_frame_1 = frames_1.get_color_frame()
             depth_frame_1 = frames_1.get_depth_frame()
-            if not color_frame_1:
+            if not color_frame_1 or not depth_frame_1:
                 continue
-            # Convert images to numpy arrays
-            color_image_1 = np.asanyarray(color_frame_1.get_data())
 
             pc1 = rs.pointcloud()
             pc1.map_to(color_frame_1)
-            points1 = pc1.calculate(depth_frame_1)
+            points1 = pc1.calculate(depth_frame:: Compute FPFH feature with search radius 0.250.
+_1)
             points1_np = points1.get_vertices()
             points1_np = np.asanyarray(points1_np)
 
@@ -124,10 +120,8 @@ if __name__ == "__main__":
             frames_2 = pipeline_2.wait_for_frames()
             color_frame_2 = frames_2.get_color_frame()
             depth_frame_2 = frames_2.get_depth_frame()
-            if not color_frame_2:
+            if not color_frame_2 or not depth_frame_2:
                 continue
-            # Convert images to numpy arrays
-            color_image_2 = np.asanyarray(color_frame_2.get_data())
 
             pc2 = rs.pointcloud()
             pc2.map_to(color_frame_2)
@@ -140,21 +134,20 @@ if __name__ == "__main__":
                 p2.append(list(i))
 
             p2 = np.asarray(p2)
-            
+
             source, target, source_down, target_down, source_fpfh, target_fpfh = prepare_dataset(
             voxel_size, p1, p2)
 
-            # result_ransac = execute_fast_global_registration(source_down, target_down,
-            #                                             source_fpfh, target_fpfh,
-            #                                             voxel_size)
-            # print(result_ransac)
+            result_ransac = execute_fast_global_registration(source_down, target_down,
+                                                        source_fpfh, target_fpfh,
+                                                        voxel_size)
 
-            # draw_registration_result(source_down, target_down, result_ransac.transformation)
+            draw_registration_result(source_down, target_down, result_ransac.transformation)
 
-            # result_icp = refine_registration(source, target, source_fpfh, target_fpfh,
-            #                                 voxel_size)
-            # print(result_icp)
-            # draw_registration_result(source, target, result_icp.transformation)
+            result_icp = refine_registration(source, target, source_fpfh, target_fpfh,
+                                            voxel_size)
+
+            draw_registration_result(source, target, result_icp.transformation)
 
 
     finally:

@@ -32,8 +32,8 @@ def prepare_dataset(voxel_size):
     print(":: Load two point clouds and disturb initial pose.")
 
     demo_icp_pcds = o3d.data.DemoICPPointClouds()
-    source = o3d.io.read_point_cloud("toolbin_6_1.ply")
-    target = o3d.io.read_point_cloud("toolbin_6_2.ply")
+    source = o3d.io.read_point_cloud("toolbin_1_1.ply")
+    target = o3d.io.read_point_cloud("toolbin_1_2.ply")
 
     draw_registration_result(source, target, np.identity(4))
 
@@ -58,6 +58,12 @@ def refine_registration(source, target, source_fpfh, target_fpfh, voxel_size):
     print(":: Point-to-plane ICP registration is applied on original point")
     print("   clouds to refine the alignment. This time we use a strict")
     print("   distance threshold %.3f." % distance_threshold)
+
+    radius_normal = voxel_size * 2
+    print(":: Estimate normal with search radius %.3f." % radius_normal)
+    target.estimate_normals(
+        o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
+
     result = o3d.pipelines.registration.registration_icp(
         source, target, distance_threshold, result_ransac.transformation,
         o3d.pipelines.registration.TransformationEstimationPointToPlane())
