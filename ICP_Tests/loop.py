@@ -2,6 +2,7 @@ import open3d as o3d
 import numpy as np
 import copy
 import pyrealsense2 as rs
+import time
 
 
 def draw_registration_result(source, target, transformation):
@@ -13,26 +14,25 @@ def draw_registration_result(source, target, transformation):
     o3d.visualization.draw_geometries([source_temp, target_temp])
                  
 def preprocess_point_cloud(pcd, voxel_size):
-    print(":: Downsample with a voxel size %.3f." % voxel_size)
+    #print(":: Downsample with a voxel size %.3f." % voxel_size)
     pcd_down = pcd.voxel_down_sample(voxel_size)
 
     radius_normal = voxel_size * 2
-    print(":: Estimate normal with search radius %.3f." % radius_normal)
+    #print(":: Estimate normal with search radius %.3f." % radius_normal)
     pcd_down.estimate_normals(
         o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
 
-    print("PCD_DOWN IN PREPROCESS", pcd_down.normals)
     #o3d.visualization.draw_geometries([pcd_down])
 
     radius_feature = voxel_size * 5
-    print(":: Compute FPFH feature with search radius %.3f." % radius_feature)
+    #print(":: Compute FPFH feature with search radius %.3f." % radius_feature)
     pcd_fpfh = o3d.pipelines.registration.compute_fpfh_feature(
         pcd_down,
         o3d.geometry.KDTreeSearchParamHybrid(radius=radius_feature, max_nn=100))
     return pcd_down, pcd_fpfh
 
 def prepare_dataset(voxel_size, source, target):
-    print(":: Load two point clouds and disturb initial pose.")
+    #print(":: Load two point clouds and disturb initial pose.")
 
     source_pcd = o3d.geometry.PointCloud()
     target_pcd = o3d.geometry.PointCloud()
@@ -50,8 +50,8 @@ def prepare_dataset(voxel_size, source, target):
 def execute_fast_global_registration(source_down, target_down, source_fpfh,
                                      target_fpfh, voxel_size):
     distance_threshold = voxel_size * 0.5
-    print(":: Apply fast global registration with distance threshold %.3f" \
-            % distance_threshold)
+    # print(":: Apply fast global registration with distance threshold %.3f" \
+    #         % distance_threshold)
     result = o3d.pipelines.registration.registration_fgr_based_on_feature_matching(
         source_down, target_down, source_fpfh, target_fpfh,
         o3d.pipelines.registration.FastGlobalRegistrationOption(
@@ -61,9 +61,9 @@ def execute_fast_global_registration(source_down, target_down, source_fpfh,
 
 def refine_registration(source, target, source_fpfh, target_fpfh, voxel_size):
     distance_threshold = voxel_size * 0.4
-    print(":: Point-to-plane ICP registration is applied on original point")
-    print("   clouds to refine the alignment. This time we use a strict")
-    print("   distance threshold %.3f." % distance_threshold)
+    # print(":: Point-to-plane ICP registration is applied on original point")
+    # print("   clouds to refine the alignment. This time we use a strict")
+    # print("   distance threshold %.3f." % distance_threshold)
 
     result = o3d.pipelines.registration.registration_icp(
         source, target, distance_threshold, result_ransac.transformation,
@@ -74,7 +74,16 @@ def trim_depth(p, min_depth = 2, max_depth = 100):
     p_trimmed = np.delete(p, np.where((p[:, 2] >= min_depth) & (p[:, 2] <= max_depth))[0], axis=0)
     return p_trimmed
 
+def unpack_buffer_data(buff):
+    p = np.transpose(np.array(list(zip(*buff))))
+    return p
+
+
 if __name__ == "__main__":
+
+    
+    start_time = time.time()
+
     voxel_size = 0.05  # means 5cm for this dataset
 
     # Configure depth and color streams...
@@ -96,9 +105,12 @@ if __name__ == "__main__":
     pipeline_1.start(config_1)
     pipeline_2.start(config_2)
 
+    print("--- %s seconds, enable pipelines ---" % (time.time() - start_time))
+
     try:
         while True:
-
+            
+            start_time = time.time()
             # https://github.com/erleben/pySoRo#adding-two-dimensional-data-protocols
             # perfectly describes the issue that I am running into ...
 
@@ -116,11 +128,7 @@ if __name__ == "__main__":
             points1_np = points1.get_vertices()
             points1_np = np.asanyarray(points1_np)
 
-            p1 = []
-            for i in points1_np:
-                p1.append(list(i))
-
-            p1 = np.asarray(p1)
+            p1 = unpack_buffer_data(points1_np)
 
             # Wait for a coherent pair of frames: depth and color
             frames_2 = pipeline_2.wait_for_frames()
@@ -135,24 +143,28 @@ if __name__ == "__main__":
             points2_np = points2.get_vertices()
             points2_np = np.asanyarray(points2_np)
 
-            p2 = []
-            for i in points2_np:
-                p2.append(list(i))
-
-            p2 = np.asarray(p2)
-
+            p2 = unpack_buffer_data(points2_np)
+            
             p1_trimmed = trim_depth(p1)
             p2_trimmed = trim_depth(p2)
 
+            print("--- %s seconds load buffer data from camera---" % (time.time() - start_time))
+
+            start_time = time.time()
             source, target, source_down, target_down, source_fpfh, target_fpfh = prepare_dataset(
             voxel_size, p1_trimmed, p2_trimmed)
+            print("--- %s seconds prepare data---" % (time.time() - start_time))
 
+            start_time = time.time()
             result_ransac = execute_fast_global_registration(source_down, target_down,
                                                         source_fpfh, target_fpfh,
                                                         voxel_size)
+            print("--- %s seconds execute ransac---" % (time.time() - start_time))
 
+            start_time = time.time()
             result_icp = refine_registration(source, target, source_fpfh, target_fpfh,
                                             voxel_size)
+            print("--- %s seconds refine registration---" % (time.time() - start_time))
 
             draw_registration_result(source, target, result_icp.transformation)
 
