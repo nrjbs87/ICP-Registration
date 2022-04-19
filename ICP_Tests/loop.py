@@ -70,6 +70,10 @@ def refine_registration(source, target, source_fpfh, target_fpfh, voxel_size):
         o3d.pipelines.registration.TransformationEstimationPointToPlane())
     return result
 
+def trim_depth(p, min_depth = 2, max_depth = 100):
+    p_trimmed = np.delete(p, np.where((p[:, 2] >= min_depth) & (p[:, 2] <= max_depth))[0], axis=0)
+    return p_trimmed
+
 if __name__ == "__main__":
     voxel_size = 0.05  # means 5cm for this dataset
 
@@ -137,13 +141,8 @@ if __name__ == "__main__":
 
             p2 = np.asarray(p2)
 
-            print(p2.shape)
-            p1_trimmed = np.delete(p1, np.where((p1[:, 2] >= 2) & (p1[:, 2] <= 100))[0], axis=0)
-            p2_trimmed = np.delete(p2, np.where((p2[:, 2] >= 2) & (p2[:, 2] <= 100))[0], axis=0)
-            print(p2_trimmed.shape)
-
-            print(np.amax(p1_trimmed[:,2]))
-            print(np.amax(p2_trimmed[:,2]))
+            p1_trimmed = trim_depth(p1)
+            p2_trimmed = trim_depth(p2)
 
             source, target, source_down, target_down, source_fpfh, target_fpfh = prepare_dataset(
             voxel_size, p1_trimmed, p2_trimmed)
@@ -151,8 +150,6 @@ if __name__ == "__main__":
             result_ransac = execute_fast_global_registration(source_down, target_down,
                                                         source_fpfh, target_fpfh,
                                                         voxel_size)
-
-            #draw_registration_result(source_down, target_down, result_ransac.transformation)
 
             result_icp = refine_registration(source, target, source_fpfh, target_fpfh,
                                             voxel_size)
