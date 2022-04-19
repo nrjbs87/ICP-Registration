@@ -19,14 +19,6 @@ if __name__ == "__main__":
     vis2.create_window(window_name='TopRight', width=960, height=540, left=960, top=0)
     vis2.add_geometry(pcd_load2)
 
-    # vis2.poll_events()
-    # vis2.update_renderer()
-    # vis2.capture_screen_image("../results/ICP/pc2.jpg")
-
-    # vis2.poll_events()
-    # vis2.update_renderer()
-    # vis2.capture_screen_image("../results/ICP/pc2.jpg")
-
     while True:
         vis1.update_geometry(pcd_load1)
         if not vis1.poll_events():

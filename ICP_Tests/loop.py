@@ -5,7 +5,6 @@ import pyrealsense2 as rs
 
 
 def draw_registration_result(source, target, transformation):
-    print("HERE")
     source_temp = copy.deepcopy(source)
     target_temp = copy.deepcopy(target)
     source_temp.paint_uniform_color([1, 0.706, 0])
@@ -22,6 +21,9 @@ def preprocess_point_cloud(pcd, voxel_size):
     pcd_down.estimate_normals(
         o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
 
+    print("PCD_DOWN IN PREPROCESS", pcd_down.normals)
+    #o3d.visualization.draw_geometries([pcd_down])
+
     radius_feature = voxel_size * 5
     print(":: Compute FPFH feature with search radius %.3f." % radius_feature)
     pcd_fpfh = o3d.pipelines.registration.compute_fpfh_feature(
@@ -37,10 +39,12 @@ def prepare_dataset(voxel_size, source, target):
     source_pcd.points = o3d.utility.Vector3dVector(source)
     target_pcd.points = o3d.utility.Vector3dVector(target)
 
-    draw_registration_result(source_pcd, target_pcd, np.identity(4))
+    np_points = np.zeros((target.shape[0], 3))
+    target_pcd.normals = o3d.utility.Vector3dVector(np_points)
 
     source_down, source_fpfh = preprocess_point_cloud(source_pcd, voxel_size)
     target_down, target_fpfh = preprocess_point_cloud(target_pcd, voxel_size)
+
     return source_pcd, target_pcd, source_down, target_down, source_fpfh, target_fpfh
 
 def execute_fast_global_registration(source_down, target_down, source_fpfh,
@@ -60,11 +64,6 @@ def refine_registration(source, target, source_fpfh, target_fpfh, voxel_size):
     print(":: Point-to-plane ICP registration is applied on original point")
     print("   clouds to refine the alignment. This time we use a strict")
     print("   distance threshold %.3f." % distance_threshold)
-
-    radius_normal = voxel_size * 2
-    print(":: Estimate normal with search radius %.3f." % radius_normal)
-    target.estimate_normals(
-        o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
 
     result = o3d.pipelines.registration.registration_icp(
         source, target, distance_threshold, result_ransac.transformation,
@@ -95,6 +94,9 @@ if __name__ == "__main__":
 
     try:
         while True:
+
+            # https://github.com/erleben/pySoRo#adding-two-dimensional-data-protocols
+            # perfectly describes the issue that I am running into ...
 
             # Camera 1
             # Wait for a coherent pair of frames: depth and color
@@ -135,14 +137,22 @@ if __name__ == "__main__":
 
             p2 = np.asarray(p2)
 
+            print(p2.shape)
+            p1_trimmed = np.delete(p1, np.where((p1[:, 2] >= 2) & (p1[:, 2] <= 100))[0], axis=0)
+            p2_trimmed = np.delete(p2, np.where((p2[:, 2] >= 2) & (p2[:, 2] <= 100))[0], axis=0)
+            print(p2_trimmed.shape)
+
+            print(np.amax(p1_trimmed[:,2]))
+            print(np.amax(p2_trimmed[:,2]))
+
             source, target, source_down, target_down, source_fpfh, target_fpfh = prepare_dataset(
-            voxel_size, p1, p2)
+            voxel_size, p1_trimmed, p2_trimmed)
 
             result_ransac = execute_fast_global_registration(source_down, target_down,
                                                         source_fpfh, target_fpfh,
                                                         voxel_size)
 
-            draw_registration_result(source_down, target_down, result_ransac.transformation)
+            #draw_registration_result(source_down, target_down, result_ransac.transformation)
 
             result_icp = refine_registration(source, target, source_fpfh, target_fpfh,
                                             voxel_size)

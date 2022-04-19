@@ -31,7 +31,6 @@ def preprocess_point_cloud(pcd, voxel_size):
 def prepare_dataset(voxel_size):
     print(":: Load two point clouds and disturb initial pose.")
 
-    demo_icp_pcds = o3d.data.DemoICPPointClouds()
     source = o3d.io.read_point_cloud("toolbin_1_1.ply")
     target = o3d.io.read_point_cloud("toolbin_1_2.ply")
 
@@ -39,6 +38,7 @@ def prepare_dataset(voxel_size):
 
     source_down, source_fpfh = preprocess_point_cloud(source, voxel_size)
     target_down, target_fpfh = preprocess_point_cloud(target, voxel_size)
+    
     return source, target, source_down, target_down, source_fpfh, target_fpfh
 
 def execute_fast_global_registration(source_down, target_down, source_fpfh,
@@ -59,10 +59,12 @@ def refine_registration(source, target, source_fpfh, target_fpfh, voxel_size):
     print("   clouds to refine the alignment. This time we use a strict")
     print("   distance threshold %.3f." % distance_threshold)
 
-    radius_normal = voxel_size * 2
-    print(":: Estimate normal with search radius %.3f." % radius_normal)
-    target.estimate_normals(
-        o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
+    #print(np.asarray(source.points).shape)
+
+    # radius_normal = voxel_size * 2
+    # print(":: Estimate normal with search radius %.3f." % radius_normal)
+    # target.estimate_normals(
+    #     o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
 
     result = o3d.pipelines.registration.registration_icp(
         source, target, distance_threshold, result_ransac.transformation,
@@ -77,12 +79,13 @@ if __name__ == "__main__":
     result_ransac = execute_fast_global_registration(source_down, target_down,
                                                 source_fpfh, target_fpfh,
                                                 voxel_size)
-    print(result_ransac)
+
+    print(type(source.normals))
 
     draw_registration_result(source_down, target_down, result_ransac.transformation)
 
     result_icp = refine_registration(source, target, source_fpfh, target_fpfh,
                                     voxel_size)
-    print(result_icp)
+
     draw_registration_result(source, target, result_icp.transformation)
 
